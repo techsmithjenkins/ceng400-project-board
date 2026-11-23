@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GCTU CENG L400 — Capstone & Project Allocation Board</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.2/dist/umd/supabase.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased" x-data="projectBoard()" x-init="init()">
+
+  <script>
+    // PASTE SUPABASE CREDENTIALS HERE (Settings -> API)
+    const SUPABASE_URL = 'https://arcqruyiemxnhnmfaxth.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFyY3FydXlpZW14bmhubWZheHRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU0NTkyNjEsImV4cCI6MjExMTAzNTI2MX0.3GYoos7njpJA0o074R2bJJ-Vm-Nstj09wtqmT4afs1U';
+  </script>
+
+  <!-- Top Navigation & Live Telemetry -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-xs font-mono uppercase tracking-wider text-emerald-400">GCTU ESA • BSc. Computer Engineering L400</span>
+        </div>
+        <h1 class="text-xl font-bold tracking-tight text-white mt-0.5">Group & Project Allocation Board</h1>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <button @click="openModal('createGroup')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition">
+          + Form / Join Group
+        </button>
+        <button @click="openModal('proposeProject')" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-sm font-medium px-3.5 py-2 rounded-lg transition">
+          Propose Custom Project
+        </button>
+        <button @click="openModal('admin')" title="Admin Console" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-400 hover:text-white p-2 rounded-lg transition">
+          Admin
+        </button>
+      </div>
+    </div>
+
+    <!-- Live Counters -->
+    <div class="max-w-7xl mx-auto px-4 pb-3 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+      <div class="bg-slate-950/70 border border-slate-800 rounded-lg px-3 py-2">
+        <span class="text-slate-400 block">Students Grouped</span>
+        <span class="text-base font-bold text-white" x-text="`${members.length} / ${roster.length}`"></span>
+      </div>
+      <div class="bg-slate-950/70 border border-slate-800 rounded-lg px-3 py-2">
+        <span class="text-slate-400 block">Groups Formed</span>
+        <span class="text-base font-bold text-cyan-400" x-text="groups.length"></span>
+      </div>
+      <div class="bg-slate-950/70 border border-slate-800 rounded-lg px-3 py-2">
+        <span class="text-slate-400 block">Available Projects</span>
+        <span class="text-base font-bold text-emerald-400" x-text="projects.filter(p => p.status === 'available').length"></span>
+      </div>
+      <div class="bg-slate-950/70 border border-slate-800 rounded-lg px-3 py-2">
+        <span class="text-slate-400 block">Pending Proposals</span>
+        <span class="text-base font-bold text-amber-400" x-text="projects.filter(p => p.status === 'pending_approval').length"></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Toast Banner -->
+  <div x-show="toast.show" x-transition class="max-w-7xl mx-auto px-4 mt-4">
+    <div :class="toast.type === 'error' ? 'bg-rose-950/90 border-rose-700 text-rose-200' : 'bg-emerald-950/90 border-emerald-700 text-emerald-200'"
+         class="border px-4 py-3 rounded-lg flex items-center justify-between text-sm">
+      <span x-text="toast.message"></span>
+      <button @click="toast.show = false" class="ml-4 opacity-75 hover:opacity-100">✕</button>
+    </div>
+  </div>
+
+  <!-- Main Workspace -->
+  <main class="max-w-7xl mx-auto px-4 py-6 space-y-8">
+
+    <!-- Section 1: Available & Claimed Projects -->
+    <section>
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <h2 class="text-lg font-semibold text-white">Project Pool (1 Group Per Project)</h2>
+        <div class="flex gap-2 text-xs">
+          <button @click="projectFilter = 'all'" :class="projectFilter === 'all' ? 'bg-cyan-600 text-white' : 'bg-slate-900 text-slate-400'" class="px-3 py-1.5 rounded-md border border-slate-800">All</button>
+          <button @click="projectFilter = 'available'" :class="projectFilter === 'available' ? 'bg-emerald-600 text-white' : 'bg-slate-900 text-slate-400'" class="px-3 py-1.5 rounded-md border border-slate-800">Available</button>
+          <button @click="projectFilter = 'claimed'" :class="projectFilter === 'claimed' ? 'bg-slate-700 text-white' : 'bg-slate-900 text-slate-400'" class="px-3 py-1.5 rounded-md border border-slate-800">Claimed</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <template x-for="proj in filteredProjects()" :key="proj.id">
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between">
+            <div>
+              <div class="flex items-start justify-between gap-2 mb-2">
+                <span x-show="proj.status === 'available'" class="text-[11px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">Available</span>
+                <span x-show="proj.status === 'claimed'" class="text-[11px] font-mono uppercase px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700" x-text="`Claimed by ${getClaimingGroupName(proj.id)}`"></span>
+                <span x-show="proj.status === 'pending_approval'" class="text-[11px] font-mono uppercase px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800">Pending Approval</span>
+                <span x-show="proj.source === 'student_proposal'" class="text-[10px] font-mono text-cyan-400">Custom</span>
+              </div>
+              <h3 class="font-semibold text-white text-base leading-snug" x-text="proj.title"></h3>
+              <p class="text-xs text-slate-400 mt-1.5 line-clamp-3" x-text="proj.description || 'No additional description provided.'"></p>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-slate-800/80">
+              <button x-show="proj.status === 'available'" @click="startClaimProject(proj)"
+                      class="w-full bg-emerald-600/20 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-700/60 text-xs font-semibold py-2 rounded-lg transition">
+                Claim for My Group
+              </button>
+              <div x-show="proj.status !== 'available'" class="text-center text-xs text-slate-500 py-1.5">
+                Locked
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
+    </section>
+
+    <!-- Section 2: Public Directory of All Groups -->
+    <section>
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <h2 class="text-lg font-semibold text-white">Public Group Directory</h2>
+        <input type="text" x-model="searchQuery" placeholder="Search group, student name, or index..."
+               class="bg-slate-900 border border-slate-700 rounded-lg px-3.5 py-2 text-sm text-white placeholder-slate-500 w-full sm:w-80 focus:outline-none focus:border-cyan-500" />
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <template x-for="grp in filteredGroups()" :key="grp.id">
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between gap-2">
+                <h3 class="font-bold text-white text-base" x-text="grp.group_name"></h3>
+                <span class="text-xs font-mono px-2 py-0.5 rounded bg-slate-800 text-cyan-300"
+                      x-text="`${getGroupMembers(grp.id).length} / 5`"></span>
+              </div>
+
+              <!-- Assigned or Proposed Project Badge -->
+              <div class="mt-2.5 p-2.5 rounded-lg bg-slate-950 border border-slate-800 text-xs">
+                <span class="text-slate-400 block text-[11px]">Project:</span>
+                <span class="font-medium text-emerald-300" x-text="getGroupProjectLabel(grp)"></span>
+              </div>
+
+              <!-- Member Roster -->
+              <ul class="mt-3 space-y-1.5">
+                <template x-for="m in getGroupMembers(grp.id)" :key="m.index_number">
+                  <li class="flex items-center justify-between text-xs bg-slate-950/60 px-2.5 py-1.5 rounded border border-slate-800/70">
+                    <span class="text-slate-200 truncate pr-2" x-text="rosterMap[m.index_number] || 'Unknown'"></span>
+                    <span class="font-mono text-slate-400 shrink-0" x-text="m.index_number"></span>
+                  </li>
+                </template>
+              </ul>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-slate-800 flex justify-between items-center text-xs">
+              <button x-show="getGroupMembers(grp.id).length < 5" @click="startJoinGroup(grp.id)"
+                      class="text-cyan-400 hover:text-cyan-300 font-medium">
+                + Join with Group PIN
+              </button>
+              <span x-show="getGroupMembers(grp.id).length >= 5" class="text-slate-500">Group Full</span>
+            </div>
+          </div>
+        </template>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL: Create or Join Group -->
+  <div x-show="activeModal === 'createGroup'" x-cloak class="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-50">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-4">
+        <div class="flex gap-2">
+          <button @click="groupTab = 'create'" :class="groupTab === 'create' ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-300'" class="px-3 py-1.5 rounded-lg text-xs font-semibold">Create New Group</button>
+          <button @click="groupTab = 'join'" :class="groupTab === 'join' ? 'bg-cyan-600 text-white' : 'bg-slate-800 text-slate-300'" class="px-3 py-1.5 rounded-lg text-xs font-semibold">Join Existing Group</button>
+        </div>
+        <button @click="activeModal = null" class="text-slate-400 hover:text-white">✕</button>
+      </div>
+
+      <!-- Create Group Form -->
+      <form x-show="groupTab === 'create'" @submit.prevent="submitCreateGroup()" class="space-y-4">
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Group Name *</label>
+          <input type="text" x-model="newGroup.name" required placeholder="e.g., CyberSquad Alpha" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" />
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">4-Digit Group PIN * (Share with teammates so they can join/pick projects)</label>
+          <input type="text" x-model="newGroup.pin" maxlength="4" pattern="\d{4}" required placeholder="e.g., 4829" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm font-mono text-white" />
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Student Index Numbers (1 to 5 members — auto-verifies from class list)</label>
+          <template x-for="(idx, i) in newGroup.indices" :key="i">
+            <div class="mb-2">
+              <input type="text" x-model="newGroup.indices[i]" :placeholder="`Member ${i+1} Index Number`"
+                     class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-sm font-mono text-white" />
+              <div x-show="newGroup.indices[i].trim()" class="text-[11px] mt-0.5 px-1">
+                <span x-show="rosterMap[newGroup.indices[i].trim()] && !memberGroupMap[newGroup.indices[i].trim()]" class="text-emerald-400" x-text="`✓ ${rosterMap[newGroup.indices[i].trim()]}`"></span>
+                <span x-show="memberGroupMap[newGroup.indices[i].trim()]" class="text-rose-400" x-text="`✕ ${rosterMap[newGroup.indices[i].trim()]} is already in a group`"></span>
+                <span x-show="!rosterMap[newGroup.indices[i].trim()]" class="text-amber-400">⚠ Index number not found in L400 roster</span>
+              </div>
+            </div>
+          </template>
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Select Project Now (Optional — can also pick or propose later)</label>
+          <select x-model="newGroup.projectId" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
+            <option value="">-- Decide Later / Propose Custom Project --</option>
+            <template x-for="p in projects.filter(x => x.status === 'available')" :key="p.id">
+              <option :value="p.id" x-text="p.title"></option>
+            </template>
+          </select>
+        </div>
+        <button type="submit" :disabled="loading" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-lg text-sm">
+          Create Group
+        </button>
+      </form>
+
+      <!-- Join Existing Group Form -->
+      <form x-show="groupTab === 'join'" @submit.prevent="submitJoinGroup()" class="space-y-4">
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Select Group</label>
+          <select x-model="joinForm.groupId" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
+            <option value="">-- Choose Group --</option>
+            <template x-for="g in groups" :key="g.id">
+              <option :value="g.id" x-text="`${g.group_name} (${getGroupMembers(g.id).length}/5)`"></option>
+            </template>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">4-Digit Group PIN</label>
+          <input type="password" x-model="joinForm.pin" maxlength="4" pattern="\d{4}" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm font-mono text-white" />
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Your Index Number</label>
+          <input type="text" x-model="joinForm.indexNumber" required placeholder="e.g., 1692988905" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm font-mono text-white" />
+          <div x-show="joinForm.indexNumber.trim()" class="text-xs mt-1">
+            <span x-show="rosterMap[joinForm.indexNumber.trim()]" class="text-emerald-400" x-text="`✓ ${rosterMap[joinForm.indexNumber.trim()]}`"></span>
+            <span x-show="!rosterMap[joinForm.indexNumber.trim()]" class="text-amber-400">⚠ Index number not found</span>
+          </div>
+        </div>
+        <button type="submit" :disabled="loading" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 rounded-lg text-sm">
+          Join Group
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Claim Project -->
+  <div x-show="activeModal === 'claimProject'" x-cloak class="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-50">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-bold text-white">Claim Project</h3>
+        <button @click="activeModal = null" class="text-slate-400 hover:text-white">✕</button>
+      </div>
+      <p class="text-xs text-emerald-400 font-medium mb-4" x-text="selectedProject?.title"></p>
+      <form @submit.prevent="submitClaimProject()" class="space-y-4">
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Your Group</label>
+          <select x-model="claimForm.groupId" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
+            <option value="">-- Select Your Group --</option>
+            <template x-for="g in groups.filter(x => !x.project_id)" :key="g.id">
+              <option :value="g.id" x-text="g.group_name"></option>
+            </template>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">4-Digit Group PIN</label>
+          <input type="password" x-model="claimForm.pin" maxlength="4" pattern="\d{4}" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm font-mono text-white" />
+        </div>
+        <button type="submit" :disabled="loading" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-lg text-sm">
+          Lock In Project
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Propose Custom Project -->
+  <div x-show="activeModal === 'proposeProject'" x-cloak class="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-50">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-bold text-white">Propose Custom Project</h3>
+        <button @click="activeModal = null" class="text-slate-400 hover:text-white">✕</button>
+      </div>
+      <form @submit.prevent="submitProposeProject()" class="space-y-4">
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Your Group</label>
+          <select x-model="proposalForm.groupId" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
+            <option value="">-- Select Your Group --</option>
+            <template x-for="g in groups.filter(x => !x.project_id)" :key="g.id">
+              <option :value="g.id" x-text="g.group_name"></option>
+            </template>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">4-Digit Group PIN</label>
+          <input type="password" x-model="proposalForm.pin" maxlength="4" pattern="\d{4}" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm font-mono text-white" />
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Proposed Project Title *</label>
+          <input type="text" x-model="proposalForm.title" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" />
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Brief Scope / Description *</label>
+          <textarea x-model="proposalForm.description" rows="3" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"></textarea>
+        </div>
+        <button type="submit" :disabled="loading" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2.5 rounded-lg text-sm">
+          Submit for Approval
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Admin Panel -->
+  <div x-show="activeModal === 'admin'" x-cloak class="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-50">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-xl w-full p-6 max-h-[90vh] overflow-y-auto space-y-6">
+      <div class="flex justify-between items-center">
+        <h3 class="font-bold text-white">Admin Control Console</h3>
+        <button @click="activeModal = null" class="text-slate-400 hover:text-white">✕</button>
+      </div>
+
+      <div>
+        <label class="block text-xs text-slate-400 mb-1">Admin Passphrase</label>
+        <input type="password" x-model="adminPass" placeholder="Enter your secret admin passphrase" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" />
+      </div>
+
+      <!-- Add Official Project -->
+      <form @submit.prevent="submitAdminAddProject()" class="space-y-3 border-t border-slate-800 pt-4">
+        <h4 class="text-sm font-semibold text-emerald-400">Add Official Project Topic</h4>
+        <input type="text" x-model="adminNewProj.title" required placeholder="Project Title" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" />
+        <textarea x-model="adminNewProj.description" rows="2" placeholder="Deliverables / Technical Specs" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"></textarea>
+        <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-lg">Publish Project</button>
+      </form>
+
+      <!-- Pending Student Proposals -->
+      <div class="border-t border-slate-800 pt-4 space-y-3">
+        <h4 class="text-sm font-semibold text-amber-400">Pending Student Proposals</h4>
+        <template x-for="prop in projects.filter(p => p.status === 'pending_approval')" :key="prop.id">
+          <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg space-y-2">
+            <div class="text-xs text-cyan-400" x-text="`Proposed by: ${getGroupNameById(prop.proposed_by_group_id)}`"></div>
+            <div class="font-semibold text-sm text-white" x-text="prop.title"></div>
+            <p class="text-xs text-slate-400" x-text="prop.description"></p>
+            <div class="flex gap-2 pt-1">
+              <button @click="reviewProposal(prop.id, true)" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-1 rounded">Approve & Assign</button>
+              <button @click="reviewProposal(prop.id, false)" class="bg-rose-600 hover:bg-rose-500 text-white text-xs px-3 py-1 rounded">Reject</button>
+            </div>
+          </div>
+        </template>
+        <p x-show="projects.filter(p => p.status === 'pending_approval').length === 0" class="text-xs text-slate-500">No pending proposals.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function projectBoard() {
+      return {
+        sb: null,
+        roster: [],
+        rosterMap: {},
+        projects: [],
+        groups: [],
+        members: [],
+        memberGroupMap: {},
+        projectFilter: 'all',
+        searchQuery: '',
+        activeModal: null,
+        groupTab: 'create',
+        loading: false,
+        toast: { show: false, message: '', type: 'success' },
+        newGroup: { name: '', pin: '', indices: ['', '', '', '', ''], projectId: '' },
+        joinForm: { groupId: '', pin: '', indexNumber: '' },
+        selectedProject: null,
+        claimForm: { groupId: '', pin: '' },
+        proposalForm: { groupId: '', pin: '', title: '', description: '' },
+        adminPass: '',
+        adminNewProj: { title: '', description: '' },
+
+        async init() {
+          this.sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+          await this.fetchAll();
+          this.sb.channel('live-board')
+            .on('postgres_changes', { event: '*', schema: 'public' }, () => this.fetchAll())
+            .subscribe();
+        },
+
+        async fetchAll() {
+          const [rRes, pRes, gRes, mRes] = await Promise.all([
+            this.sb.from('class_roster').select('*').order('full_name'),
+            this.sb.from('projects').select('*').order('created_at', { ascending: true }),
+            this.sb.from('groups').select('*').order('created_at', { ascending: true }),
+            this.sb.from('group_members').select('*').order('joined_at', { ascending: true })
+          ]);
+          if (rRes.data) {
+            this.roster = rRes.data;
+            this.rosterMap = Object.fromEntries(rRes.data.map(r => [r.index_number, r.full_name]));
+          }
+          if (pRes.data) this.projects = pRes.data;
+          if (gRes.data) this.groups = gRes.data;
+          if (mRes.data) {
+            this.members = mRes.data;
+            this.memberGroupMap = Object.fromEntries(mRes.data.map(m => [m.index_number, m.group_id]));
+          }
+        },
+
+        notify(message, type = 'success') {
+          this.toast = { show: true, message, type };
+          setTimeout(() => { this.toast.show = false; }, 5000);
+        },
+
+        openModal(name) { this.activeModal = name; },
+        getGroupMembers(groupId) { return this.members.filter(m => m.group_id === groupId); },
+        getGroupNameById(groupId) { return this.groups.find(g => g.id === groupId)?.group_name || 'Unknown'; },
+        getClaimingGroupName(projectId) { return this.groups.find(g => g.project_id === projectId)?.group_name || 'Locked'; },
+
+        getGroupProjectLabel(grp) {
+          if (grp.project_id) {
+            return this.projects.find(p => p.id === grp.project_id)?.title || 'Assigned';
+          }
+          const pending = this.projects.find(p => p.proposed_by_group_id === grp.id && p.status === 'pending_approval');
+          return pending ? `⏳ Pending Approval: ${pending.title}` : 'No project selected yet';
+        },
+
+        filteredProjects() {
+          if (this.projectFilter === 'all') return this.projects.filter(p => p.status !== 'rejected');
+          return this.projects.filter(p => p.status === this.projectFilter);
+        },
+
+        filteredGroups() {
+          const q = this.searchQuery.trim().toLowerCase();
+          if (!q) return this.groups;
+          return this.groups.filter(g => {
+            if (g.group_name.toLowerCase().includes(q)) return true;
+            return this.getGroupMembers(g.id).some(m =>
+              m.index_number.includes(q) || (this.rosterMap[m.index_number] || '').toLowerCase().includes(q)
+            );
+          });
+        },
+
+        startJoinGroup(groupId) {
+          this.groupTab = 'join';
+          this.joinForm.groupId = groupId;
+          this.activeModal = 'createGroup';
+        },
+
+        startClaimProject(proj) {
+          this.selectedProject = proj;
+          this.activeModal = 'claimProject';
+        },
+
+        async submitCreateGroup() {
+          this.loading = true;
+          const cleanIndices = [...new Set(this.newGroup.indices.map(s => s.trim()).filter(Boolean))];
+          const { error } = await this.sb.rpc('create_group_atomic', {
+            p_group_name: this.newGroup.name,
+            p_pin: this.newGroup.pin,
+            p_member_indices: cleanIndices,
+            p_project_id: this.newGroup.projectId || null
+          });
+          this.loading = false;
+          if (error) return this.notify(error.message, 'error');
+          this.newGroup = { name: '', pin: '', indices: ['', '', '', '', ''], projectId: '' };
+          this.activeModal = null;
+          this.notify('Group formed and locked into the registry.');
+          await this.fetchAll();
+        },
+
+        async submitJoinGroup() {
+          this.loading = true;
+          const { error } = await this.sb.rpc('join_group_atomic', {
+            p_group_id: this.joinForm.groupId,
+            p_pin: this.joinForm.pin,
+            p_index_number: this.joinForm.indexNumber
+          });
+          this.loading = false;
+          if (error) return this.notify(error.message, 'error');
+          this.joinForm = { groupId: '', pin: '', indexNumber: '' };
+          this.activeModal = null;
+          this.notify('Successfully joined group.');
+          await this.fetchAll();
+        },
+
+        async submitClaimProject() {
+          this.loading = true;
+          const { error } = await this.sb.rpc('claim_project_atomic', {
+            p_group_id: this.claimForm.groupId,
+            p_pin: this.claimForm.pin,
+            p_project_id: this.selectedProject.id
+          });
+          this.loading = false;
+          if (error) return this.notify(error.message, 'error');
+          this.claimForm = { groupId: '', pin: '' };
+          this.activeModal = null;
+          this.notify('Project exclusively claimed for your group!');
+          await this.fetchAll();
+        },
+
+        async submitProposeProject() {
+          this.loading = true;
+          const { error } = await this.sb.rpc('propose_custom_project', {
+            p_group_id: this.proposalForm.groupId,
+            p_pin: this.proposalForm.pin,
+            p_title: this.proposalForm.title,
+            p_description: this.proposalForm.description
+          });
+          this.loading = false;
+          if (error) return this.notify(error.message, 'error');
+          this.proposalForm = { groupId: '', pin: '', title: '', description: '' };
+          this.activeModal = null;
+          this.notify('Custom project proposal submitted for review.');
+          await this.fetchAll();
+        },
+
+        async submitAdminAddProject() {
+          const { error } = await this.sb.rpc('admin_add_project', {
+            p_admin_pass: this.adminPass,
+            p_title: this.adminNewProj.title,
+            p_description: this.adminNewProj.description
+          });
+          if (error) return this.notify(error.message, 'error');
+          this.adminNewProj = { title: '', description: '' };
+          this.notify('Official project published to the board.');
+          await this.fetchAll();
+        },
+
+        async reviewProposal(projectId, approve) {
+          const { error } = await this.sb.rpc('admin_review_proposal', {
+            p_admin_pass: this.adminPass,
+            p_project_id: projectId,
+            p_approve: approve
+          });
+          if (error) return this.notify(error.message, 'error');
+          this.notify(approve ? 'Proposal approved and assigned to proposing group.' : 'Proposal rejected.');
+          await this.fetchAll();
+        }
+      };
+    }
+  </script>
+</body>
+</html>
