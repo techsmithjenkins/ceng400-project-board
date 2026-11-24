@@ -50,7 +50,6 @@
   x-data="projectBoard()" x-init="init()">
 
   <script>
-    // PASTE SUPABASE CREDENTIALS HERE (Settings -> API)
     const SUPABASE_URL = 'https://arcqruyiemxnhnmfaxth.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFyY3FydXlpZW14bmhubWZheHRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU0NTkyNjEsImV4cCI6MjExMTAzNTI2MX0.3GYoos7njpJA0o074R2bJJ-Vm-Nstj09wtqmT4afs1U';
   </script>
@@ -97,7 +96,7 @@
       </div>
     </div>
 
-    <!-- Compact Mobile Progress Pill (Saves Vertical Space on Phones) -->
+    <!-- Compact Mobile Progress Pill -->
     <div class="sm:hidden px-4 pb-2.5">
       <div
         class="bg-slate-50 border border-slate-200/90 rounded-xl px-3 py-2 flex items-center justify-between gap-3 text-xs">
@@ -158,7 +157,7 @@
       </div>
     </div>
 
-    <!-- Segmented Navigation Tabs (Prevents Long Single-Page Scroll) -->
+    <!-- Segmented Navigation Tabs -->
     <div class="max-w-6xl mx-auto px-4 sm:px-6 border-t border-slate-100 bg-white">
       <div class="flex items-center gap-1 sm:gap-2 py-2 overflow-x-auto">
         <button @click="activeTab = 'projects'"
@@ -176,6 +175,9 @@
           <span>Formed Groups</span>
           <span :class="activeTab === 'groups' ? 'bg-indigo-700 text-white' : 'bg-slate-200 text-slate-700'"
             class="font-mono text-[11px] px-1.5 py-0.2 rounded-md" x-text="groups.length"></span>
+          <span x-show="joinRequests.length > 0"
+            class="bg-amber-400 text-slate-950 font-mono text-[10px] font-bold px-1.5 py-0.2 rounded-full"
+            x-text="`🔔 ${joinRequests.length}`"></span>
         </button>
 
         <button @click="activeTab = 'peers'"
@@ -287,7 +289,6 @@
                     </div>
                     <p class="text-slate-600" x-text="parseProject(proj).scope"></p>
 
-                    <!-- Collapsible Hardware & Test Details to keep mobile cards short -->
                     <div class="pt-1">
                       <button type="button" @click="toggleCard(proj.id)"
                         class="text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
@@ -329,8 +330,8 @@
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
         <div>
           <h2 class="text-base sm:text-lg font-bold text-slate-900">Formed Student Groups</h2>
-          <p class="text-xs text-slate-500">Live public directory of all registered teams, members, and locked projects.
-          </p>
+          <p class="text-xs text-slate-500">Request to join an open team or enter your group's 4-digit PIN to approve
+            incoming requests.</p>
         </div>
         <input type="text" x-model="searchQuery" placeholder="Search group, student name, or index..."
           class="bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-slate-900 placeholder-slate-400 w-full sm:w-72 focus:outline-none focus:border-indigo-500 shadow-2xs" />
@@ -348,7 +349,6 @@
             <div>
               <div class="flex items-center justify-between gap-2">
                 <h3 class="font-bold text-slate-900 text-base truncate" x-text="grp.group_name"></h3>
-                <!-- Capacity badge -->
                 <span class="text-xs font-mono font-semibold px-2.5 py-0.5 rounded-lg border shrink-0"
                   :class="getGroupMembers(grp.id).length >= (grp.max_members || 5) ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-indigo-50 text-indigo-700 border-indigo-200'"
                   x-text="`${getGroupMembers(grp.id).length} / ${grp.max_members || 5}`"></span>
@@ -378,14 +378,29 @@
               </ul>
             </div>
 
-            <div class="mt-3.5 pt-2.5 border-t border-slate-100 flex justify-between items-center text-xs">
-              <button x-show="getGroupMembers(grp.id).length < (grp.max_members || 5)" @click="startJoinGroup(grp.id)"
-                class="text-indigo-600 hover:text-indigo-800 font-semibold py-0.5">
-                + Join with 4-Digit PIN
+            <div class="mt-3.5 pt-2.5 border-t border-slate-100 space-y-2 text-xs">
+              <!-- Live Pending Requests Banner -->
+              <button x-show="getGroupPendingRequests(grp.id).length > 0" @click="openReviewRequests(grp)"
+                class="w-full flex items-center justify-between bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-900 px-3 py-1.5 rounded-lg font-semibold transition">
+                <span>🔔 <span x-text="getGroupPendingRequests(grp.id).length"></span> Join Request(s)</span>
+                <span class="text-[11px] underline">Review →</span>
               </button>
-              <span x-show="getGroupMembers(grp.id).length >= (grp.max_members || 5)"
+
+              <!-- Open Slot Actions vs. Full State -->
+              <div x-show="getGroupMembers(grp.id).length < (grp.max_members || 5)"
+                class="flex items-center justify-between gap-2">
+                <button @click="startRequestJoin(grp)"
+                  class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-3 py-1.5 rounded-lg transition">
+                  Request to Join
+                </button>
+                <button @click="startJoinGroup(grp.id)" class="text-slate-500 hover:text-indigo-700 font-medium py-1">
+                  Have PIN? Join
+                </button>
+              </div>
+
+              <div x-show="getGroupMembers(grp.id).length >= (grp.max_members || 5)"
                 class="text-emerald-700 font-mono font-semibold text-[11px]"
-                x-text="`✓ Group Full (${grp.max_members || 5}/${grp.max_members || 5})`"></span>
+                x-text="`✓ Group Full (${grp.max_members || 5}/${grp.max_members || 5})`"></div>
             </div>
           </div>
         </template>
@@ -621,6 +636,99 @@
     </div>
   </div>
 
+  <!-- MODAL: Request to Join a Group (Applicant - No PIN needed) -->
+  <div x-show="activeModal === 'requestJoin'" x-cloak
+    class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
+    <div class="bg-white border border-slate-200 rounded-t-2xl sm:rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl">
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="font-bold text-slate-900 text-base">Request to Join Group</h3>
+        <button @click="activeModal = null" class="text-slate-400 hover:text-slate-700 p-1.5 font-bold">✕</button>
+      </div>
+      <p class="text-xs text-indigo-700 font-semibold mb-4 bg-indigo-50 border border-indigo-200 px-3 py-2 rounded-xl">
+        Target Team: <span x-text="targetGroup?.group_name"></span>
+        (<span x-text="targetGroup ? `${getGroupMembers(targetGroup.id).length}/${targetGroup.max_members || 5}` : ''"></span>)
+      </p>
+
+      <form @submit.prevent="submitRequestJoin()" class="space-y-4">
+        <div>
+          <label class="block text-xs text-slate-700 font-semibold mb-1">Your Index Number *</label>
+          <input type="text" inputmode="numeric" x-model="requestForm.indexNumber" required placeholder="e.g., 1692988905"
+            class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-mono text-slate-900 focus:bg-white focus:outline-none focus:border-indigo-500" />
+          <div x-show="requestForm.indexNumber.trim()" class="text-xs font-medium mt-1">
+            <span x-show="rosterMap[requestForm.indexNumber.trim()] && !memberGroupMap[requestForm.indexNumber.trim()]"
+              class="text-emerald-700" x-text="`✓ ${rosterMap[requestForm.indexNumber.trim()]}`"></span>
+            <span x-show="memberGroupMap[requestForm.indexNumber.trim()]" class="text-rose-600"
+              x-text="`✕ ${rosterMap[requestForm.indexNumber.trim()]} is already in a group`"></span>
+            <span x-show="!rosterMap[requestForm.indexNumber.trim()]" class="text-amber-600">⚠ Index number not found in
+              L400 roster</span>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs text-slate-700 font-semibold mb-1">Short Note / Phone (Optional)</label>
+          <input type="text" maxlength="140" x-model="requestForm.note"
+            placeholder="e.g., Can handle ESP32/Python — 024XXXXXXX"
+            class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:bg-white focus:outline-none focus:border-indigo-500" />
+        </div>
+
+        <button type="submit" :disabled="loading"
+          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-sm shadow-sm transition">
+          <span x-text="loading ? 'Sending Request...' : 'Send Join Request'"></span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Review Incoming Join Requests (Group Insiders with PIN) -->
+  <div x-show="activeModal === 'reviewRequests'" x-cloak
+    class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
+    <div
+      class="bg-white border border-slate-200 rounded-t-2xl sm:rounded-2xl max-w-md w-full p-5 sm:p-6 max-h-[90vh] overflow-y-auto space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+        <div>
+          <h3 class="font-bold text-slate-900 text-base">Incoming Join Requests</h3>
+          <p class="text-xs text-slate-500" x-text="targetGroup?.group_name"></p>
+        </div>
+        <button @click="activeModal = null" class="text-slate-400 hover:text-slate-700 p-1.5 font-bold">✕</button>
+      </div>
+
+      <div>
+        <label class="block text-xs text-slate-700 font-semibold mb-1">Enter Your 4-Digit Group PIN to Approve / Reject
+          *</label>
+        <input type="password" inputmode="numeric" maxlength="4" pattern="\d{4}" x-model="reviewPin" placeholder="••••"
+          class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-mono text-slate-900 focus:bg-white focus:outline-none focus:border-emerald-500" />
+      </div>
+
+      <div class="space-y-2.5">
+        <template x-for="req in targetGroup ? getGroupPendingRequests(targetGroup.id) : []" :key="req.id">
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2">
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-bold text-sm text-slate-900" x-text="rosterMap[req.index_number] || 'Unknown'"></span>
+              <span class="font-mono text-xs text-slate-500" x-text="req.index_number"></span>
+            </div>
+            <p x-show="req.note"
+              class="text-xs text-slate-600 bg-white border border-slate-200/80 px-2.5 py-1.5 rounded-lg"
+              x-text="req.note"></p>
+            <div class="grid grid-cols-2 gap-2 pt-1">
+              <button type="button" :disabled="loading" @click="respondJoinRequest(req.id, true)"
+                class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 rounded-lg transition">
+                ✓ Approve
+              </button>
+              <button type="button" :disabled="loading" @click="respondJoinRequest(req.id, false)"
+                class="bg-white hover:bg-rose-50 border border-rose-200 text-rose-600 text-xs font-bold py-2 rounded-lg transition">
+                ✕ Decline
+              </button>
+            </div>
+          </div>
+        </template>
+        <p x-show="targetGroup && getGroupPendingRequests(targetGroup.id).length === 0"
+          class="text-xs text-slate-400 text-center py-4">
+          No pending requests remaining for this group.
+        </p>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: Admin Panel -->
   <div x-show="activeModal === 'admin'" x-cloak
     class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
@@ -651,7 +759,7 @@
         <div>
           <h4 class="text-xs font-bold text-indigo-950">Official Allocation Spreadsheet (CSV)</h4>
           <p class="text-[11px] text-indigo-800 mt-0.5">Exports Group #, Group Name, Members, Index Numbers, Project
-            Code, Title, Tier, Status & Timestamps.</p>
+            Code, Title, Tier & Status.</p>
         </div>
         <button type="button" @click="exportCSV()"
           class="bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl shrink-0 shadow-xs transition text-center">
@@ -738,6 +846,10 @@
         groups: [],
         members: [],
         memberGroupMap: {},
+        joinRequests: [],
+        targetGroup: null,
+        requestForm: { indexNumber: '', note: '' },
+        reviewPin: '',
         activeTab: 'projects',
         expandedCards: {},
         projectFilter: 'all',
@@ -756,6 +868,7 @@
         proposalForm: { groupId: '', pin: '', title: '', description: '' },
         adminPass: '',
         adminNewProj: { title: '', description: '' },
+        overrideGroupId: '',
 
         async init() {
           this.sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -766,11 +879,12 @@
         },
 
         async fetchAll() {
-          const [rRes, pRes, gRes, mRes] = await Promise.all([
+          const [rRes, pRes, gRes, mRes, reqRes] = await Promise.all([
             this.sb.from('class_roster').select('*').order('full_name'),
             this.sb.from('projects').select('*').order('created_at', { ascending: true }),
             this.sb.from('groups').select('*').order('created_at', { ascending: true }),
-            this.sb.from('group_members').select('*').order('joined_at', { ascending: true })
+            this.sb.from('group_members').select('*').order('joined_at', { ascending: true }),
+            this.sb.from('join_requests').select('*').eq('status', 'pending').order('created_at', { ascending: true })
           ]);
           if (rRes.data) {
             this.roster = rRes.data;
@@ -782,6 +896,7 @@
             this.members = mRes.data;
             this.memberGroupMap = Object.fromEntries(mRes.data.map(m => [m.index_number, m.group_id]));
           }
+          if (reqRes.data) this.joinRequests = reqRes.data;
         },
 
         toggleCard(id) {
@@ -819,6 +934,56 @@
         getGroupMembers(groupId) { return this.members.filter(m => m.group_id === groupId); },
         getGroupNameById(groupId) { return this.groups.find(g => g.id === groupId)?.group_name || 'Unknown'; },
         getClaimingGroupName(projectId) { return this.groups.find(g => g.project_id === projectId)?.group_name || 'Locked'; },
+
+        getGroupPendingRequests(groupId) {
+          return this.joinRequests.filter(r => r.group_id === groupId);
+        },
+
+        startRequestJoin(grp) {
+          this.targetGroup = grp;
+          this.requestForm = { indexNumber: '', note: '' };
+          this.activeModal = 'requestJoin';
+        },
+
+        openReviewRequests(grp) {
+          this.targetGroup = grp;
+          this.reviewPin = '';
+          this.activeModal = 'reviewRequests';
+        },
+
+        async submitRequestJoin() {
+          this.loading = true;
+          const { error } = await this.sb.rpc('request_to_join_group', {
+            p_group_id: this.targetGroup.id,
+            p_index_number: this.requestForm.indexNumber,
+            p_note: this.requestForm.note
+          });
+          this.loading = false;
+          if (error) return this.notify(error.message, 'error');
+          this.activeModal = null;
+          this.notify('Join request sent! Ask any member of the group to approve it.');
+          await this.fetchAll();
+        },
+
+        async respondJoinRequest(requestId, approve) {
+          if (!/^\d{4}$/.test(this.reviewPin)) {
+            return this.notify('Enter your 4-digit Group PIN first.', 'error');
+          }
+          this.loading = true;
+          const { data, error } = await this.sb.rpc('respond_join_request', {
+            p_request_id: requestId,
+            p_pin: this.reviewPin,
+            p_approve: approve
+          });
+          this.loading = false;
+          if (error) return this.notify(error.message, 'error');
+          if (data && data.success === false) {
+            this.notify(data.message, 'error');
+          } else {
+            this.notify(data?.message || (approve ? 'Member added!' : 'Request declined.'));
+          }
+          await this.fetchAll();
+        },
 
         ungroupedStudents() {
           return this.roster.filter(r => !this.memberGroupMap[r.index_number]);
@@ -881,7 +1046,7 @@
           this.activeModal = 'claimProject';
         },
 
-       exportCSV() {
+        exportCSV() {
           if (this.groups.length === 0) {
             return this.notify('No groups formed yet to export.', 'error');
           }
