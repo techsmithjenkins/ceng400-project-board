@@ -881,7 +881,7 @@
           this.activeModal = 'claimProject';
         },
 
-        exportCSV() {
+       exportCSV() {
           if (this.groups.length === 0) {
             return this.notify('No groups formed yet to export.', 'error');
           }
@@ -892,28 +892,17 @@
             'Member Slot',
             'Index Number',
             'Student Full Name',
-            'Group Size',
-            'Max Capacity',
             'Project Code',
             'Project Title',
             'Difficulty / Type',
-            'Project Status',
-            'Group Created (GMT)',
-            'Member Joined (GMT)'
+            'Project Status'
           ];
 
           const escapeCell = (val) => `"${String(val ?? '').replace(/"/g, '""')}"`;
-          const formatDate = (iso) => {
-            if (!iso) return '';
-            const d = new Date(iso);
-            return isNaN(d) ? iso : d.toISOString().replace('T', ' ').slice(0, 16);
-          };
-
           const rows = [headers.map(escapeCell).join(',')];
 
           this.groups.forEach((g, gIdx) => {
             const gMembers = this.getGroupMembers(g.id);
-            const maxCap = g.max_members || 5;
             const assignedProj = g.project_id ? this.projects.find(p => p.id === g.project_id) : null;
             const pendingProj = !assignedProj
               ? this.projects.find(p => p.proposed_by_group_id === g.id && p.status === 'pending_approval')
@@ -944,14 +933,10 @@
                 '—',
                 '—',
                 'No members recorded',
-                `0 / ${maxCap}`,
-                maxCap,
                 projCode,
                 projTitle,
                 projType,
-                projStatus,
-                formatDate(g.created_at),
-                ''
+                projStatus
               ].map(escapeCell).join(','));
             } else {
               gMembers.forEach((m, mIdx) => {
@@ -961,14 +946,10 @@
                   mIdx === 0 ? 'Member 1 (Lead)' : `Member ${mIdx + 1}`,
                   m.index_number,
                   this.rosterMap[m.index_number] || 'Unknown',
-                  `${gMembers.length} / ${maxCap}`,
-                  maxCap,
                   projCode,
                   projTitle,
                   projType,
-                  projStatus,
-                  formatDate(g.created_at),
-                  formatDate(m.joined_at)
+                  projStatus
                 ].map(escapeCell).join(','));
               });
             }
