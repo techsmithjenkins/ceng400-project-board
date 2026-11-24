@@ -1,22 +1,21 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
-  <meta name="theme-color" content="#020617" />
+  <meta name="theme-color" content="#ffffff" />
   <title>GCTU CENG L400 — Computer Vision Project & Group Board</title>
 
-  <!-- Custom Computer Vision & Engineering SVG Favicon (Bounding Box + Optical Aperture) -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23020617'/%3E%3Crect x='2' y='2' width='60' height='60' rx='12' fill='none' stroke='%2310b981' stroke-opacity='0.35' stroke-width='2'/%3E%3Cpath d='M12 22V14a2 2 0 0 1 2-2h8M42 12h8a2 2 0 0 1 2 2v8M52 42v8a2 2 0 0 1-2 2h-8M22 52h-8a2 2 0 0 1-2-2v-8' fill='none' stroke='%2334d399' stroke-width='3.5' stroke-linecap='round'/%3E%3Ccircle cx='32' cy='32' r='13' fill='none' stroke='%2322d3ee' stroke-width='3'/%3E%3Ccircle cx='32' cy='32' r='5' fill='%2310b981'/%3E%3Cpath d='M32 15v4M32 45v4M15 32h4M45 32h4' stroke='%2322d3ee' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <!-- Crisp Daylight Computer Vision & Engineering Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23ffffff'/%3E%3Crect x='2' y='2' width='60' height='60' rx='14' fill='none' stroke='%23059669' stroke-width='3'/%3E%3Cpath d='M13 23V15a2 2 0 0 1 2-2h8M41 13h8a2 2 0 0 1 2 2v8M51 41v8a2 2 0 0 1-2 2h-8M23 51h-8a2 2 0 0 1-2-2v-8' fill='none' stroke='%23059669' stroke-width='4' stroke-linecap='round'/%3E%3Ccircle cx='32' cy='32' r='12' fill='%23ecfdf5' stroke='%234f46e5' stroke-width='3.5'/%3E%3Ccircle cx='32' cy='32' r='4.5' fill='%23059669'/%3E%3C/svg%3E" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: {
         extend: {
           fontFamily: {
@@ -31,128 +30,167 @@
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
   <style>
     [x-cloak] { display: none !important; }
-    .bg-grid {
-      background-image: radial-gradient(rgba(16, 185, 129, 0.08) 1px, transparent 1px);
-      background-size: 24px 24px;
+    .bg-blueprint {
+      background-color: #f8fafc;
+      background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+      background-size: 22px 22px;
     }
   </style>
 </head>
-<body class="bg-slate-950 bg-grid text-slate-100 min-h-screen font-sans antialiased pb-24 sm:pb-12 selection:bg-emerald-500/30 selection:text-emerald-200"
+<body class="bg-blueprint text-slate-800 min-h-screen font-sans antialiased pb-24 sm:pb-12 selection:bg-emerald-100 selection:text-emerald-900"
       x-data="projectBoard()" x-init="init()">
 
-  <script>
+    <script>
     // PASTE SUPABASE CREDENTIALS HERE (Settings -> API)
     const SUPABASE_URL = 'https://arcqruyiemxnhnmfaxth.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFyY3FydXlpZW14bmhubWZheHRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU0NTkyNjEsImV4cCI6MjExMTAzNTI2MX0.3GYoos7njpJA0o074R2bJJ-Vm-Nstj09wtqmT4afs1U';
   </script>
-  
-  <!-- Sticky Glass Header -->
-  <header class="border-b border-slate-800/90 bg-slate-950/85 backdrop-blur-md sticky top-0 z-30">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-3">
+
+  <!-- Crisp Bright Header -->
+  <header class="bg-white/95 backdrop-blur-md border-b border-slate-200/90 sticky top-0 z-30 shadow-xs">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
       <div class="flex items-center gap-3 min-w-0">
-        <!-- Inline Brand Emblem -->
-        <div class="h-10 w-10 rounded-xl bg-slate-900 border border-emerald-500/30 flex items-center justify-center shrink-0 shadow-inner">
+        <div class="h-10 w-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0">
           <svg class="w-6 h-6" viewBox="0 0 64 64" fill="none">
-            <path d="M12 22V14a2 2 0 0 1 2-2h8M42 12h8a2 2 0 0 1 2 2v8M52 42v8a2 2 0 0 1-2 2h-8M22 52h-8a2 2 0 0 1-2-2v-8" stroke="#34d399" stroke-width="4" stroke-linecap="round"/>
-            <circle cx="32" cy="32" r="12" stroke="#22d3ee" stroke-width="3.5"/>
-            <circle cx="32" cy="32" r="4.5" fill="#10b981"/>
+            <path d="M13 23V15a2 2 0 0 1 2-2h8M41 13h8a2 2 0 0 1 2 2v8M51 41v8a2 2 0 0 1-2 2h-8M23 51h-8a2 2 0 0 1-2-2v-8" stroke="#059669" stroke-width="4.5" stroke-linecap="round"/>
+            <circle cx="32" cy="32" r="11.5" stroke="#4f46e5" stroke-width="3.5"/>
+            <circle cx="32" cy="32" r="4.5" fill="#059669"/>
           </svg>
         </div>
         <div class="min-w-0">
-          <div class="flex items-center gap-2">
-            <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
-            <span class="text-[11px] font-mono uppercase tracking-wider text-emerald-400 truncate">GCTU ESA • CENG L400</span>
+          <div class="flex items-center gap-1.5">
+            <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+            <span class="text-[11px] font-mono font-semibold uppercase tracking-wider text-emerald-700 truncate">GCTU ESA • CENG L400</span>
           </div>
-          <h1 class="text-base sm:text-xl font-bold tracking-tight text-white truncate">Project & Group Allocation Board</h1>
+          <h1 class="text-base sm:text-lg font-extrabold tracking-tight text-slate-900 truncate">CV Project & Group Board</h1>
         </div>
       </div>
 
-      <!-- Desktop & Tablet Actions -->
+      <!-- Primary Top Actions -->
       <div class="flex items-center gap-2 shrink-0">
-        <button @click="openModal('ungrouped')" class="hidden md:inline-flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-cyan-300 text-xs sm:text-sm font-medium px-3.5 py-2 rounded-xl transition">
-          <span>Find Teammates</span>
-          <span class="bg-cyan-950 border border-cyan-800/80 text-cyan-300 font-mono text-[11px] px-1.5 py-0.5 rounded-md" x-text="ungroupedStudents().length"></span>
-        </button>
-        <button @click="openModal('createGroup')" class="hidden sm:inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-semibold px-4 py-2 rounded-xl shadow-lg shadow-emerald-950/50 transition">
+        <button @click="openModal('createGroup')" class="hidden sm:inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold px-4 py-2 rounded-xl shadow-sm transition">
           <span>+ Form / Join Group</span>
         </button>
-        <button @click="openModal('proposeProject')" class="hidden lg:inline-flex bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 text-sm font-medium px-3.5 py-2 rounded-xl transition">
+        <button @click="openModal('proposeProject')" class="hidden md:inline-flex bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 text-xs sm:text-sm font-semibold px-3.5 py-2 rounded-xl transition">
           Propose Custom
         </button>
-        <button @click="openModal('admin')" title="Admin Console" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white text-xs sm:text-sm font-medium px-3 py-2 rounded-xl transition">
+        <button @click="openModal('admin')" class="bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 text-xs font-semibold px-3 py-2 rounded-xl transition">
           Admin
         </button>
       </div>
     </div>
 
-    <!-- Telemetry Strip -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 pb-3.5 grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
-      <div class="bg-slate-900/80 border border-slate-800/90 rounded-xl px-3.5 py-2.5">
-        <div class="flex items-center justify-between text-[11px] text-slate-400">
-          <span>Students Grouped</span>
-          <span class="font-mono text-emerald-400" x-text="roster.length ? `${Math.round((members.length / roster.length) * 100)}%` : '0%'"></span>
+    <!-- Compact Mobile Progress Pill (Saves Vertical Space on Phones) -->
+    <div class="sm:hidden px-4 pb-2.5">
+      <div class="bg-slate-50 border border-slate-200/90 rounded-xl px-3 py-2 flex items-center justify-between gap-3 text-xs">
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-slate-900 font-mono" x-text="`${members.length}/${roster.length}`"></span>
+          <span class="text-slate-500">grouped</span>
         </div>
-        <div class="text-base sm:text-lg font-bold text-white mt-0.5 font-mono" x-text="`${members.length} / ${roster.length}`"></div>
-        <div class="w-full bg-slate-800 h-1.5 rounded-full mt-1.5 overflow-hidden">
+        <div class="flex-1 bg-slate-200 h-1.5 rounded-full overflow-hidden max-w-[100px]">
+          <div class="bg-emerald-500 h-full transition-all duration-500" :style="`width: ${roster.length ? (members.length / roster.length) * 100 : 0}%`"></div>
+        </div>
+        <div class="font-mono font-semibold text-emerald-700" x-text="`${projects.filter(p => p.status === 'available').length} open`"></div>
+      </div>
+    </div>
+
+    <!-- Desktop/Tablet 4-Card Telemetry Strip -->
+    <div class="hidden sm:grid max-w-6xl mx-auto px-6 pb-3 grid-cols-4 gap-3">
+      <div class="bg-slate-50 border border-slate-200/80 rounded-xl px-3.5 py-2">
+        <div class="flex items-center justify-between text-[11px] text-slate-500 font-medium">
+          <span>Students Grouped</span>
+          <span class="font-mono font-semibold text-emerald-700" x-text="roster.length ? `${Math.round((members.length / roster.length) * 100)}%` : '0%'"></span>
+        </div>
+        <div class="text-base font-extrabold text-slate-900 font-mono mt-0.5" x-text="`${members.length} / ${roster.length}`"></div>
+        <div class="w-full bg-slate-200 h-1.5 rounded-full mt-1.5 overflow-hidden">
           <div class="bg-emerald-500 h-full transition-all duration-500" :style="`width: ${roster.length ? (members.length / roster.length) * 100 : 0}%`"></div>
         </div>
       </div>
 
-      <div class="bg-slate-900/80 border border-slate-800/90 rounded-xl px-3.5 py-2.5 flex flex-col justify-between">
-        <span class="text-[11px] text-slate-400">Groups Formed</span>
-        <div class="flex items-baseline justify-between mt-1">
-          <span class="text-base sm:text-lg font-bold text-cyan-400 font-mono" x-text="groups.length"></span>
-          <span class="text-[11px] text-slate-500 font-mono">Target ~29–30</span>
+      <div class="bg-slate-50 border border-slate-200/80 rounded-xl px-3.5 py-2 flex flex-col justify-between">
+        <span class="text-[11px] text-slate-500 font-medium">Groups Formed</span>
+        <div class="flex items-baseline justify-between">
+          <span class="text-base font-extrabold text-indigo-600 font-mono" x-text="groups.length"></span>
+          <span class="text-[11px] text-slate-400 font-mono">Target ~29–30</span>
         </div>
       </div>
 
-      <div class="bg-slate-900/80 border border-slate-800/90 rounded-xl px-3.5 py-2.5 flex flex-col justify-between">
-        <span class="text-[11px] text-slate-400">Available Projects</span>
-        <div class="flex items-baseline justify-between mt-1">
-          <span class="text-base sm:text-lg font-bold text-emerald-400 font-mono" x-text="projects.filter(p => p.status === 'available').length"></span>
-          <span class="text-[11px] text-slate-500 font-mono" x-text="`${projects.filter(p => p.status === 'claimed').length} claimed`"></span>
+      <div class="bg-slate-50 border border-slate-200/80 rounded-xl px-3.5 py-2 flex flex-col justify-between">
+        <span class="text-[11px] text-slate-500 font-medium">Open Projects</span>
+        <div class="flex items-baseline justify-between">
+          <span class="text-base font-extrabold text-emerald-600 font-mono" x-text="projects.filter(p => p.status === 'available').length"></span>
+          <span class="text-[11px] text-slate-400 font-mono" x-text="`${projects.filter(p => p.status === 'claimed').length} claimed`"></span>
         </div>
       </div>
 
-      <div class="bg-slate-900/80 border border-slate-800/90 rounded-xl px-3.5 py-2.5 flex flex-col justify-between">
-        <span class="text-[11px] text-slate-400">Ungrouped Peers</span>
-        <div class="flex items-baseline justify-between mt-1">
-          <span class="text-base sm:text-lg font-bold text-amber-400 font-mono" x-text="ungroupedStudents().length"></span>
-          <button @click="openModal('ungrouped')" class="text-[11px] text-cyan-400 hover:underline">View List →</button>
+      <div class="bg-slate-50 border border-slate-200/80 rounded-xl px-3.5 py-2 flex flex-col justify-between">
+        <span class="text-[11px] text-slate-500 font-medium">Ungrouped Peers</span>
+        <div class="flex items-baseline justify-between">
+          <span class="text-base font-extrabold text-amber-600 font-mono" x-text="ungroupedStudents().length"></span>
+          <button @click="activeTab = 'peers'" class="text-[11px] text-indigo-600 font-semibold hover:underline">Browse →</button>
         </div>
+      </div>
+    </div>
+
+    <!-- Segmented Navigation Tabs (Prevents Long Single-Page Scroll) -->
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 border-t border-slate-100 bg-white">
+      <div class="flex items-center gap-1 sm:gap-2 py-2 overflow-x-auto">
+        <button @click="activeTab = 'projects'"
+                :class="activeTab === 'projects' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100'"
+                class="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-1.5 shrink-0 transition">
+          <span>Projects</span>
+          <span :class="activeTab === 'projects' ? 'bg-emerald-700 text-white' : 'bg-slate-200 text-slate-700'"
+                class="font-mono text-[11px] px-1.5 py-0.2 rounded-md" x-text="projects.filter(p => p.status !== 'rejected').length"></span>
+        </button>
+
+        <button @click="activeTab = 'groups'"
+                :class="activeTab === 'groups' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100'"
+                class="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-1.5 shrink-0 transition">
+          <span>Formed Groups</span>
+          <span :class="activeTab === 'groups' ? 'bg-indigo-700 text-white' : 'bg-slate-200 text-slate-700'"
+                class="font-mono text-[11px] px-1.5 py-0.2 rounded-md" x-text="groups.length"></span>
+        </button>
+
+        <button @click="activeTab = 'peers'"
+                :class="activeTab === 'peers' ? 'bg-amber-500 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100'"
+                class="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-1.5 shrink-0 transition">
+          <span>Ungrouped Peers</span>
+          <span :class="activeTab === 'peers' ? 'bg-amber-600 text-white' : 'bg-slate-200 text-slate-700'"
+                class="font-mono text-[11px] px-1.5 py-0.2 rounded-md" x-text="ungroupedStudents().length"></span>
+        </button>
       </div>
     </div>
   </header>
 
   <!-- Floating Toast Notification -->
   <div x-show="toast.show" x-cloak x-transition class="fixed top-20 right-4 left-4 sm:left-auto sm:w-96 z-50">
-    <div :class="toast.type === 'error' ? 'bg-rose-950/95 border-rose-600 text-rose-100' : 'bg-emerald-950/95 border-emerald-600 text-emerald-100'"
-         class="border px-4 py-3 rounded-xl shadow-2xl flex items-start justify-between gap-3 text-sm backdrop-blur">
+    <div :class="toast.type === 'error' ? 'bg-rose-600 text-white border-rose-700' : 'bg-emerald-600 text-white border-emerald-700'"
+         class="border px-4 py-3 rounded-xl shadow-lg flex items-start justify-between gap-3 text-sm font-medium">
       <span x-text="toast.message"></span>
-      <button @click="toast.show = false" class="opacity-75 hover:opacity-100 font-bold">✕</button>
+      <button @click="toast.show = false" class="opacity-80 hover:opacity-100 font-bold">✕</button>
     </div>
   </div>
 
-  <!-- Main Workspace -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-10">
+  <!-- Main Tabbed Workspace -->
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 pt-5">
 
-    <!-- Section 1: Computer Vision Project Pool -->
-    <section>
+    <!-- TAB 1: COMPUTER VISION PROJECT POOL -->
+    <section x-show="activeTab === 'projects'" x-transition.opacity>
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
         <div>
-          <h2 class="text-lg sm:text-xl font-bold text-white">Computer Vision Project Pool</h2>
-          <p class="text-xs text-slate-400 mt-0.5">Strict 1-group-per-project lock. Need a custom topic? <button @click="openModal('proposeProject')" class="text-cyan-400 hover:underline font-medium">Submit a proposal</button>.</p>
+          <h2 class="text-base sm:text-lg font-bold text-slate-900">Computer Vision Project Options</h2>
+          <p class="text-xs text-slate-500">1 group per project. Have your own idea? <button @click="openModal('proposeProject')" class="text-indigo-600 font-semibold hover:underline">Propose a custom project</button>.</p>
         </div>
 
-        <!-- Search & Responsive Filter Controls -->
+        <!-- Compact Search & Filters -->
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-          <input type="text" x-model="projectSearch" placeholder="Filter by keyword, ESP32, Arduino..."
-                 class="bg-slate-900 border border-slate-700/90 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-white placeholder-slate-500 sm:w-64 focus:outline-none focus:border-emerald-500" />
-          <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-            <button @click="projectFilter = 'all'" :class="projectFilter === 'all' ? 'bg-cyan-600 text-white border-cyan-500' : 'bg-slate-900 text-slate-400 border-slate-800'" class="px-3 py-1.5 rounded-lg border text-xs font-medium shrink-0 transition">All</button>
-            <button @click="projectFilter = 'available'" :class="projectFilter === 'available' ? 'bg-emerald-600 text-white border-emerald-500' : 'bg-slate-900 text-slate-400 border-slate-800'" class="px-3 py-1.5 rounded-lg border text-xs font-medium shrink-0 transition">Available</button>
-            <button @click="projectFilter = 'claimed'" :class="projectFilter === 'claimed' ? 'bg-slate-700 text-white border-slate-600' : 'bg-slate-900 text-slate-400 border-slate-800'" class="px-3 py-1.5 rounded-lg border text-xs font-medium shrink-0 transition">Claimed</button>
-            <select x-model="tierFilter" class="bg-slate-900 border border-slate-800 text-slate-300 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-cyan-500 shrink-0">
+          <input type="text" x-model="projectSearch" placeholder="Search topic, ESP32, Arduino..."
+                 class="bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-slate-900 placeholder-slate-400 sm:w-56 focus:outline-none focus:border-emerald-500 shadow-2xs" />
+          <div class="flex items-center gap-1.5 overflow-x-auto">
+            <button @click="projectFilter = 'all'" :class="projectFilter === 'all' ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 border-slate-200'" class="px-3 py-1.5 rounded-lg border text-xs font-semibold shrink-0 transition">All</button>
+            <button @click="projectFilter = 'available'" :class="projectFilter === 'available' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-600 border-slate-200'" class="px-3 py-1.5 rounded-lg border text-xs font-semibold shrink-0 transition">Open</button>
+            <button @click="projectFilter = 'claimed'" :class="projectFilter === 'claimed' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200'" class="px-3 py-1.5 rounded-lg border text-xs font-semibold shrink-0 transition">Claimed</button>
+            <select x-model="tierFilter" class="bg-white border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-emerald-500 shrink-0">
               <option value="all">All Tiers</option>
               <option value="Foundation">Foundation</option>
               <option value="Intermediate">Intermediate</option>
@@ -162,71 +200,73 @@
         </div>
       </div>
 
-      <!-- Empty State -->
-      <div x-show="filteredProjects().length === 0" class="bg-slate-900/60 border border-dashed border-slate-800 rounded-2xl p-8 text-center text-sm text-slate-400">
+      <div x-show="filteredProjects().length === 0" class="bg-white border border-dashed border-slate-300 rounded-2xl p-8 text-center text-sm text-slate-500">
         No projects match your current filter.
       </div>
 
-      <!-- Project Cards Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
         <template x-for="proj in filteredProjects()" :key="proj.id">
-          <article class="bg-slate-900/90 border rounded-2xl p-4 sm:p-5 flex flex-col justify-between transition"
-                   :class="proj.status === 'available' ? 'border-slate-800 hover:border-emerald-500/40' : 'border-slate-800/60 opacity-85'">
+          <article class="bg-white border rounded-2xl p-4 flex flex-col justify-between shadow-2xs transition"
+                   :class="proj.status === 'available' ? 'border-slate-200/90 hover:border-emerald-400 hover:shadow-md' : 'border-slate-200/60 bg-slate-50/70'">
             <div>
-              <!-- Card Top Metadata Row -->
-              <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+              <!-- Top Badges -->
+              <div class="flex flex-wrap items-center justify-between gap-1.5 mb-2.5">
                 <div class="flex items-center gap-1.5">
-                  <span x-show="parseProject(proj).code" class="text-xs font-mono font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-200 border border-slate-700" x-text="parseProject(proj).code"></span>
+                  <span x-show="parseProject(proj).code" class="text-[11px] font-mono font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200" x-text="parseProject(proj).code"></span>
                   <span x-show="parseProject(proj).tier"
                         :class="{
-                          'bg-emerald-950/90 text-emerald-300 border-emerald-800/80': parseProject(proj).tier === 'Foundation',
-                          'bg-cyan-950/90 text-cyan-300 border-cyan-800/80': parseProject(proj).tier === 'Intermediate',
-                          'bg-purple-950/90 text-purple-300 border-purple-800/80': parseProject(proj).tier === 'Advanced'
+                          'bg-emerald-50 text-emerald-700 border-emerald-200': parseProject(proj).tier === 'Foundation',
+                          'bg-sky-50 text-sky-700 border-sky-200': parseProject(proj).tier === 'Intermediate',
+                          'bg-purple-50 text-purple-700 border-purple-200': parseProject(proj).tier === 'Advanced'
                         }"
-                        class="text-[11px] font-mono px-2 py-0.5 rounded-md border"
+                        class="text-[11px] font-mono font-medium px-2 py-0.5 rounded-md border"
                         x-text="parseProject(proj).tier"></span>
-                  <span x-show="proj.source === 'student_proposal'" class="text-[11px] font-mono px-2 py-0.5 rounded-md bg-cyan-950 text-cyan-300 border border-cyan-800">Custom</span>
+                  <span x-show="proj.source === 'student_proposal'" class="text-[11px] font-mono font-medium px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200">Custom</span>
                 </div>
 
-                <span x-show="proj.status === 'available'" class="text-[11px] font-mono uppercase px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">● Open</span>
-                <span x-show="proj.status === 'claimed'" class="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-slate-800 text-amber-300 border border-slate-700 truncate max-w-[180px]" x-text="`Claimed: ${getClaimingGroupName(proj.id)}`"></span>
-                <span x-show="proj.status === 'pending_approval'" class="text-[11px] font-mono px-2 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-800">Pending Review</span>
+                <span x-show="proj.status === 'available'" class="text-[11px] font-mono font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">● Open</span>
+                <span x-show="proj.status === 'claimed'" class="text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 truncate max-w-[165px]" x-text="`Claimed: ${getClaimingGroupName(proj.id)}`"></span>
+                <span x-show="proj.status === 'pending_approval'" class="text-[11px] font-mono font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">Pending</span>
               </div>
 
-              <!-- Project Title -->
-              <h3 class="font-bold text-white text-base leading-snug" x-text="parseProject(proj).cleanTitle"></h3>
+              <!-- Clean Title -->
+              <h3 class="font-bold text-slate-900 text-sm sm:text-base leading-snug" x-text="parseProject(proj).cleanTitle"></h3>
 
-              <!-- Structured Spec Breakdown -->
-              <div class="mt-3 space-y-2 text-xs leading-relaxed">
+              <!-- Compact Summary + Expandable Controller Details -->
+              <div class="mt-2.5 text-xs leading-relaxed">
                 <template x-if="parseProject(proj).structured">
                   <div class="space-y-2">
-                    <div class="bg-slate-950/80 border border-slate-800/80 rounded-lg p-2.5">
-                      <span class="text-[10px] font-mono uppercase tracking-wider text-cyan-400 block">Target Beneficiary</span>
-                      <span class="text-slate-200" x-text="parseProject(proj).beneficiary"></span>
+                    <div class="text-slate-600">
+                      <span class="font-semibold text-slate-800">Beneficiary:</span>
+                      <span x-text="parseProject(proj).beneficiary"></span>
                     </div>
-                    <div>
-                      <span class="text-[10px] font-mono uppercase tracking-wider text-slate-400 block">Vision Task & Scope</span>
-                      <p class="text-slate-300" x-text="parseProject(proj).scope"></p>
-                    </div>
-                    <div class="pt-1 border-t border-slate-800/70">
-                      <span class="text-[10px] font-mono uppercase tracking-wider text-emerald-400 block">Controller & Evaluation</span>
-                      <p class="text-slate-400" x-text="parseProject(proj).controller"></p>
+                    <p class="text-slate-600" x-text="parseProject(proj).scope"></p>
+
+                    <!-- Collapsible Hardware & Test Details to keep mobile cards short -->
+                    <div class="pt-1">
+                      <button type="button" @click="toggleCard(proj.id)" class="text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
+                        <span x-text="expandedCards[proj.id] ? 'Hide Controller & Test Specs ▲' : 'Controller & Test Specs ▼'"></span>
+                      </button>
+                      <div x-show="expandedCards[proj.id]" x-transition class="mt-1.5 p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-600">
+                        <span class="font-semibold text-emerald-700 block text-[11px] mb-0.5">Hardware & Evaluation:</span>
+                        <span x-text="parseProject(proj).controller"></span>
+                      </div>
                     </div>
                   </div>
                 </template>
                 <template x-if="!parseProject(proj).structured">
-                  <p class="text-slate-300" x-text="proj.description || 'No additional description provided.'"></p>
+                  <p class="text-slate-600" x-text="proj.description || 'No additional description provided.'"></p>
                 </template>
               </div>
             </div>
 
-            <!-- Action Footer -->
-            <div class="mt-4 pt-3 border-t border-slate-800/80">
+            <!-- Action Button -->
+            <div class="mt-3.5 pt-3 border-t border-slate-100">
               <button x-show="proj.status === 'available'" @click="startClaimProject(proj)"
-                      class="w-full bg-emerald-600/15 hover:bg-emerald-600 active:bg-emerald-500 text-emerald-300 hover:text-white border border-emerald-600/40 text-xs font-semibold py-2.5 rounded-xl transition">
+                      class="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-semibold py-2.5 rounded-xl shadow-2xs transition">
                 Claim Project for My Group
               </button>
-              <div x-show="proj.status !== 'available'" class="text-center text-xs font-mono text-slate-500 py-1.5">
+              <div x-show="proj.status !== 'available'" class="text-center text-xs font-mono text-slate-400 py-1">
                 Locked
               </div>
             </div>
@@ -235,156 +275,153 @@
       </div>
     </section>
 
-    <!-- Section 2: Public Group Directory -->
-    <section>
+    <!-- TAB 2: FORMED GROUPS DIRECTORY -->
+    <section x-show="activeTab === 'groups'" x-cloak x-transition.opacity>
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
         <div>
-          <h2 class="text-lg sm:text-xl font-bold text-white">Public Group Directory</h2>
-          <p class="text-xs text-slate-400 mt-0.5">Live view of all registered teams, members, and locked project selections.</p>
+          <h2 class="text-base sm:text-lg font-bold text-slate-900">Formed Student Groups</h2>
+          <p class="text-xs text-slate-500">Live public directory of all registered teams, members, and locked projects.</p>
         </div>
         <input type="text" x-model="searchQuery" placeholder="Search group, student name, or index..."
-               class="bg-slate-900 border border-slate-700/90 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-white placeholder-slate-500 w-full sm:w-80 focus:outline-none focus:border-cyan-500" />
+               class="bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-slate-900 placeholder-slate-400 w-full sm:w-72 focus:outline-none focus:border-indigo-500 shadow-2xs" />
       </div>
 
-      <div x-show="filteredGroups().length === 0" class="bg-slate-900/60 border border-dashed border-slate-800 rounded-2xl p-8 text-center text-sm text-slate-400">
-        No groups formed yet. Tap <span class="text-emerald-400 font-semibold">+ Form / Join Group</span> to register the first team.
+      <div x-show="filteredGroups().length === 0" class="bg-white border border-dashed border-slate-300 rounded-2xl p-8 text-center text-sm text-slate-500">
+        No groups formed yet. Tap <button @click="openModal('createGroup')" class="text-emerald-600 font-bold hover:underline">+ Form / Join Group</button> to register the first team.
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
         <template x-for="grp in filteredGroups()" :key="grp.id">
-          <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col justify-between">
+          <div class="bg-white border border-slate-200/90 rounded-2xl p-4 flex flex-col justify-between shadow-2xs">
             <div>
               <div class="flex items-center justify-between gap-2">
-                <h3 class="font-bold text-white text-base truncate" x-text="grp.group_name"></h3>
-                <span class="text-xs font-mono px-2.5 py-1 rounded-lg border shrink-0"
-                      :class="getGroupMembers(grp.id).length >= 5 ? 'bg-emerald-950/70 text-emerald-300 border-emerald-800' : 'bg-slate-800 text-cyan-300 border-slate-700'"
+                <h3 class="font-bold text-slate-900 text-base truncate" x-text="grp.group_name"></h3>
+                <span class="text-xs font-mono font-semibold px-2.5 py-0.5 rounded-lg border shrink-0"
+                      :class="getGroupMembers(grp.id).length >= 5 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-indigo-50 text-indigo-700 border-indigo-200'"
                       x-text="`${getGroupMembers(grp.id).length} / 5`"></span>
               </div>
 
-              <!-- Assigned Project Callout -->
-              <div class="mt-3 p-3 rounded-xl bg-slate-950 border border-slate-800/90 text-xs">
+              <!-- Assigned Project Pill -->
+              <div class="mt-2.5 p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 text-xs">
                 <span class="text-slate-400 font-mono uppercase text-[10px] tracking-wider block">Selected Project</span>
-                <span class="font-semibold mt-0.5 block"
-                      :class="grp.project_id ? 'text-emerald-300' : 'text-amber-300'"
+                <span class="font-bold mt-0.5 block"
+                      :class="grp.project_id ? 'text-emerald-700' : 'text-amber-600'"
                       x-text="getGroupProjectLabel(grp)"></span>
               </div>
 
-              <!-- Member Roster -->
+              <!-- Member List -->
               <ul class="mt-3 space-y-1.5">
                 <template x-for="(m, idx) in getGroupMembers(grp.id)" :key="m.index_number">
-                  <li class="flex items-center justify-between text-xs bg-slate-950/70 px-3 py-2 rounded-lg border border-slate-800/80">
+                  <li class="flex items-center justify-between text-xs bg-slate-50/80 px-2.5 py-1.5 rounded-lg border border-slate-200/70">
                     <div class="flex items-center gap-2 min-w-0 pr-2">
-                      <span class="text-[10px] font-mono text-slate-500" x-text="`0${idx+1}`"></span>
-                      <span class="text-slate-200 font-medium truncate" x-text="rosterMap[m.index_number] || 'Unknown'"></span>
+                      <span class="text-[10px] font-mono font-semibold text-slate-400" x-text="`0${idx+1}`"></span>
+                      <span class="text-slate-800 font-medium truncate" x-text="rosterMap[m.index_number] || 'Unknown'"></span>
                     </div>
-                    <span class="font-mono text-[11px] text-slate-400 shrink-0" x-text="m.index_number"></span>
+                    <span class="font-mono text-[11px] text-slate-500 shrink-0" x-text="m.index_number"></span>
                   </li>
                 </template>
               </ul>
             </div>
 
-            <div class="mt-4 pt-3 border-t border-slate-800 flex justify-between items-center text-xs">
+            <div class="mt-3.5 pt-2.5 border-t border-slate-100 flex justify-between items-center text-xs">
               <button x-show="getGroupMembers(grp.id).length < 5" @click="startJoinGroup(grp.id)"
-                      class="text-cyan-400 hover:text-cyan-300 font-semibold py-1">
+                      class="text-indigo-600 hover:text-indigo-800 font-semibold py-0.5">
                 + Join with 4-Digit PIN
               </button>
-              <span x-show="getGroupMembers(grp.id).length >= 5" class="text-emerald-400/80 font-mono text-[11px]">✓ Roster Complete (5/5)</span>
+              <span x-show="getGroupMembers(grp.id).length >= 5" class="text-emerald-700 font-mono font-semibold text-[11px]">✓ Group Full (5/5)</span>
             </div>
+          </div>
+        </template>
+      </div>
+    </section>
+
+    <!-- TAB 3: UNGROUPED CLASSMATES DIRECTORY -->
+    <section x-show="activeTab === 'peers'" x-cloak x-transition.opacity>
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+        <div>
+          <h2 class="text-base sm:text-lg font-bold text-slate-900">Ungrouped Classmates (<span x-text="ungroupedStudents().length"></span>)</h2>
+          <p class="text-xs text-slate-500">Tap "+ Add" next to any classmate to start a new group with their index pre-filled.</p>
+        </div>
+        <input type="text" x-model="ungroupedSearch" placeholder="Search peer by name or index number..."
+               class="bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-slate-900 placeholder-slate-400 w-full sm:w-72 focus:outline-none focus:border-amber-500 shadow-2xs" />
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+        <template x-for="st in filteredUngrouped()" :key="st.index_number">
+          <div class="bg-white border border-slate-200/90 px-3.5 py-2.5 rounded-xl flex items-center justify-between gap-2 shadow-2xs">
+            <div class="min-w-0">
+              <div class="font-semibold text-slate-900 text-xs sm:text-sm truncate" x-text="st.full_name"></div>
+              <div class="font-mono text-slate-500 text-[11px]" x-text="st.index_number"></div>
+            </div>
+            <button @click="quickAddToGroup(st.index_number)"
+                    class="bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white border border-emerald-200 px-3 py-1.5 rounded-lg text-xs font-semibold shrink-0 transition">
+              + Add
+            </button>
           </div>
         </template>
       </div>
     </section>
   </main>
 
-  <!-- Mobile Sticky Bottom Dock (Thumb-Friendly Navigation) -->
-  <nav class="sm:hidden fixed bottom-0 inset-x-0 z-30 bg-slate-950/95 backdrop-blur-md border-t border-slate-800 px-3 py-2.5 grid grid-cols-3 gap-2">
-    <button @click="openModal('createGroup')" class="bg-emerald-600 active:bg-emerald-500 text-white text-xs font-bold py-2.5 rounded-xl text-center shadow-lg">
+  <!-- Mobile Bottom Action Bar -->
+  <nav class="sm:hidden fixed bottom-0 inset-x-0 z-30 bg-white/95 backdrop-blur-md border-t border-slate-200 px-3 py-2 grid grid-cols-3 gap-2 shadow-lg">
+    <button @click="openModal('createGroup')" class="bg-emerald-600 active:bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-xl text-center shadow-xs">
       + Form / Join
     </button>
-    <button @click="openModal('ungrouped')" class="bg-slate-900 border border-slate-700 text-cyan-300 text-xs font-semibold py-2.5 rounded-xl text-center">
-      Peers (<span x-text="ungroupedStudents().length"></span>)
+    <button @click="activeTab = activeTab === 'groups' ? 'projects' : 'groups'"
+            class="bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold py-2.5 rounded-xl text-center">
+      <span x-text="activeTab === 'groups' ? 'View Projects' : `Groups (${groups.length})`"></span>
     </button>
-    <button @click="openModal('proposeProject')" class="bg-slate-900 border border-slate-700 text-slate-200 text-xs font-semibold py-2.5 rounded-xl text-center">
+    <button @click="openModal('proposeProject')" class="bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold py-2.5 rounded-xl text-center">
       Propose Idea
     </button>
   </nav>
 
-  <!-- MODAL: Ungrouped Classmates Finder -->
-  <div x-show="activeModal === 'ungrouped'" x-cloak class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
-    <div class="bg-slate-900 border border-slate-700 rounded-t-2xl sm:rounded-2xl max-w-lg w-full p-5 sm:p-6 max-h-[88vh] flex flex-col">
-      <div class="flex justify-between items-center pb-3 border-b border-slate-800">
-        <div>
-          <h3 class="font-bold text-white text-base">Ungrouped Classmates</h3>
-          <p class="text-xs text-slate-400" x-text="`${ungroupedStudents().length} of ${roster.length} students available`"></p>
-        </div>
-        <button @click="activeModal = null" class="text-slate-400 hover:text-white p-1.5">✕</button>
-      </div>
-
-      <input type="text" x-model="ungroupedSearch" placeholder="Search available classmate by name or index..."
-             class="mt-3 w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500" />
-
-      <div class="mt-3 overflow-y-auto space-y-1.5 pr-1 flex-1">
-        <template x-for="st in filteredUngrouped()" :key="st.index_number">
-          <div class="flex items-center justify-between bg-slate-950/90 border border-slate-800 px-3 py-2.5 rounded-xl text-xs">
-            <div class="min-w-0 pr-2">
-              <div class="font-semibold text-slate-100 truncate" x-text="st.full_name"></div>
-              <div class="font-mono text-slate-400 text-[11px]" x-text="st.index_number"></div>
-            </div>
-            <button @click="quickAddToGroup(st.index_number)"
-                    class="bg-emerald-600/20 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-700/60 px-2.5 py-1.5 rounded-lg font-semibold shrink-0 transition">
-              + Add to Group
-            </button>
-          </div>
-        </template>
-      </div>
-    </div>
-  </div>
-
   <!-- MODAL: Create or Join Group -->
-  <div x-show="activeModal === 'createGroup'" x-cloak class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
-    <div class="bg-slate-900 border border-slate-700 rounded-t-2xl sm:rounded-2xl max-w-lg w-full p-5 sm:p-6 max-h-[92vh] overflow-y-auto">
+  <div x-show="activeModal === 'createGroup'" x-cloak class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
+    <div class="bg-white border border-slate-200 rounded-t-2xl sm:rounded-2xl max-w-lg w-full p-5 sm:p-6 max-h-[92vh] overflow-y-auto shadow-2xl">
       <div class="flex justify-between items-center mb-4">
         <div class="flex gap-2">
-          <button @click="groupTab = 'create'" :class="groupTab === 'create' ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-300'" class="px-3.5 py-2 rounded-xl text-xs font-semibold transition">Create New Group</button>
-          <button @click="groupTab = 'join'" :class="groupTab === 'join' ? 'bg-cyan-600 text-white' : 'bg-slate-800 text-slate-300'" class="px-3.5 py-2 rounded-xl text-xs font-semibold transition">Join Existing Group</button>
+          <button @click="groupTab = 'create'" :class="groupTab === 'create' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600'" class="px-3.5 py-2 rounded-xl text-xs font-bold transition">Create New Group</button>
+          <button @click="groupTab = 'join'" :class="groupTab === 'join' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600'" class="px-3.5 py-2 rounded-xl text-xs font-bold transition">Join Existing Group</button>
         </div>
-        <button @click="activeModal = null" class="text-slate-400 hover:text-white p-1.5">✕</button>
+        <button @click="activeModal = null" class="text-slate-400 hover:text-slate-700 p-1.5 font-bold">✕</button>
       </div>
 
       <!-- Create Group Form -->
       <form x-show="groupTab === 'create'" @submit.prevent="submitCreateGroup()" class="space-y-4">
         <div>
-          <label class="block text-xs text-slate-300 font-medium mb-1">Group Name *</label>
-          <input type="text" x-model="newGroup.name" required placeholder="e.g., VisionCore Team" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white" />
+          <label class="block text-xs text-slate-700 font-semibold mb-1">Group Name *</label>
+          <input type="text" x-model="newGroup.name" required placeholder="e.g., VisionCore Team" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:bg-white focus:outline-none focus:border-emerald-500" />
         </div>
         <div>
-          <label class="block text-xs text-slate-300 font-medium mb-1">4-Digit Group PIN * (Share with teammates to join/lock projects)</label>
-          <input type="text" inputmode="numeric" x-model="newGroup.pin" maxlength="4" pattern="\d{4}" required placeholder="e.g., 4829" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-mono text-white" />
+          <label class="block text-xs text-slate-700 font-semibold mb-1">4-Digit Group PIN * (Share with teammates to join/lock projects)</label>
+          <input type="text" inputmode="numeric" x-model="newGroup.pin" maxlength="4" pattern="\d{4}" required placeholder="e.g., 4829" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-mono text-slate-900 focus:bg-white focus:outline-none focus:border-emerald-500" />
         </div>
         <div>
-          <label class="block text-xs text-slate-300 font-medium mb-1">Student Index Numbers (1 to 5 members — auto-verifies from L400 list)</label>
+          <label class="block text-xs text-slate-700 font-semibold mb-1">Student Index Numbers (1 to 5 members — auto-verifies from L400 list)</label>
           <template x-for="(idx, i) in newGroup.indices" :key="i">
             <div class="mb-2">
               <input type="text" inputmode="numeric" x-model="newGroup.indices[i]" :placeholder="`Member ${i+1} Index Number`"
-                     class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-sm font-mono text-white" />
-              <div x-show="newGroup.indices[i].trim()" class="text-[11px] mt-1 px-1">
-                <span x-show="rosterMap[newGroup.indices[i].trim()] && !memberGroupMap[newGroup.indices[i].trim()]" class="text-emerald-400" x-text="`✓ ${rosterMap[newGroup.indices[i].trim()]}`"></span>
-                <span x-show="memberGroupMap[newGroup.indices[i].trim()]" class="text-rose-400" x-text="`✕ ${rosterMap[newGroup.indices[i].trim()]} is already in a group`"></span>
-                <span x-show="!rosterMap[newGroup.indices[i].trim()]" class="text-amber-400">⚠ Index number not found in L400 roster</span>
+                     class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm font-mono text-slate-900 focus:bg-white focus:outline-none focus:border-emerald-500" />
+              <div x-show="newGroup.indices[i].trim()" class="text-[11px] font-medium mt-1 px-1">
+                <span x-show="rosterMap[newGroup.indices[i].trim()] && !memberGroupMap[newGroup.indices[i].trim()]" class="text-emerald-700" x-text="`✓ ${rosterMap[newGroup.indices[i].trim()]}`"></span>
+                <span x-show="memberGroupMap[newGroup.indices[i].trim()]" class="text-rose-600" x-text="`✕ ${rosterMap[newGroup.indices[i].trim()]} is already in a group`"></span>
+                <span x-show="!rosterMap[newGroup.indices[i].trim()]" class="text-amber-600">⚠ Index number not found in L400 roster</span>
               </div>
             </div>
           </template>
         </div>
         <div>
-          <label class="block text-xs text-slate-300 font-medium mb-1">Select Project Now (Optional — can pick or propose later)</label>
-          <select x-model="newGroup.projectId" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white">
+          <label class="block text-xs text-slate-700 font-semibold mb-1">Select Project Now (Optional — can pick or propose later)</label>
+          <select x-model="newGroup.projectId" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:bg-white focus:outline-none focus:border-emerald-500">
             <option value="">-- Decide Later / Propose Custom Project --</option>
             <template x-for="p in projects.filter(x => x.status === 'available')" :key="p.id">
               <option :value="p.id" x-text="p.title"></option>
             </template>
           </select>
         </div>
-        <button type="submit" :disabled="loading" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-xl text-sm transition">
+        <button type="submit" :disabled="loading" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm shadow-sm transition">
           <span x-text="loading ? 'Registering...' : 'Create Group'"></span>
         </button>
       </form>
@@ -392,8 +429,8 @@
       <!-- Join Existing Group Form -->
       <form x-show="groupTab === 'join'" @submit.prevent="submitJoinGroup()" class="space-y-4">
         <div>
-          <label class="block text-xs text-slate-300 font-medium mb-1">Select Group</label>
-          <select x-model="joinForm.groupId" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white">
+          <label class="block text-xs text-slate-700 font-semibold mb-1">Select Group</label>
+          <select x-model="joinForm.groupId" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:bg-white focus:outline-none focus:border-indigo-500">
             <option value="">-- Choose Group --</option>
             <template x-for="g in groups" :key="g.id">
               <option :value="g.id" x-text="`${g.group_name} (${getGroupMembers(g.id).length}/5)`"></option>
@@ -401,18 +438,18 @@
           </select>
         </div>
         <div>
-          <label class="block text-xs text-slate-300 font-medium mb-1">4-Digit Group PIN</label>
-          <input type="password" inputmode="numeric" x-model="joinForm.pin" maxlength="4" pattern="\d{4}" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-mono text-white" />
+          <label class="block text-xs text-slate-700 font-semibold mb-1">4-Digit Group PIN</label>
+          <input type="password" inputmode="numeric" x-model="joinForm.pin" maxlength="4" pattern="\d{4}" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-mono text-slate-900 focus:bg-white focus:outline-none focus:border-indigo-500" />
         </div>
         <div>
-          <label class="block text-xs text-slate-300 font-medium mb-1">Your Index Number</label>
-          <input type="text" inputmode="numeric" x-model="joinForm.indexNumber" required placeholder="e.g., 1692988905" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-mono text-white" />
-          <div x-show="joinForm.indexNumber.trim()" class="text-xs mt-1">
-            <span x-show="rosterMap[joinForm.indexNumber.trim()]" class="text-emerald-400" x-text="`✓ ${rosterMap[joinForm.indexNumber.trim()]}`"></span>
-            <span x-show="!rosterMap[joinForm.indexNumber.trim()]" class="text-amber-400">⚠ Index number not found</span>
+          <label class="block text-xs text-slate-700 font-semibold mb-1">Your Index Number</label>
+          <input type="text" inputmode="numeric" x-model="joinForm.indexNumber" required placeholder="e.g., 1692988905" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-mono text-slate-900 focus:bg-white focus:outline-none focus:border-indigo-500" />
+          <div x-show="joinForm.indexNumber.trim()" class="text-xs font-medium mt-1">
+            <span x-show="rosterMap[joinForm.indexNumber.trim()]" class="text-emerald-700" x-text="`✓ ${rosterMap[joinForm.indexNumber.trim()]}`"></span>
+            <span x-show="!rosterMap[joinForm.indexNumber.trim()]" class="text-amber-600">⚠ Index number not found</span>
           </div>
         </div>
-        <button type="submit" :disabled="loading" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-3 rounded-xl text-sm transition">
+        <button type="submit" :disabled="loading" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-sm shadow-sm transition">
           <span x-text="loading ? 'Joining...' : 'Join Group'"></span>
         </button>
       </form>
@@ -420,17 +457,17 @@
   </div>
 
   <!-- MODAL: Claim Project -->
-  <div x-show="activeModal === 'claimProject'" x-cloak class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
-    <div class="bg-slate-900 border border-slate-700 rounded-t-2xl sm:rounded-2xl max-w-md w-full p-5 sm:p-6">
+  <div x-show="activeModal === 'claimProject'" x-cloak class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
+    <div class="bg-white border border-slate-200 rounded-t-2xl sm:rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl">
       <div class="flex justify-between items-center mb-2">
-        <h3 class="font-bold text-white text-base">Claim Project</h3>
-        <button @click="activeModal = null" class="text-slate-400 hover:text-white p-1.5">✕</button>
+        <h3 class="font-bold text-slate-900 text-base">Claim Project</h3>
+        <button @click="activeModal = null" class="text-slate-400 hover:text-slate-700 p-1.5 font-bold">✕</button>
       </div>
-      <p class="text-xs text-emerald-400 font-semibold mb-4" x-text="selectedProject?.title"></p>
+      <p class="text-xs text-emerald-700 font-bold mb-4 bg-emerald-50 border border-emerald-200 px-3 py-2 rounded-xl" x-text="selectedProject?.title"></p>
       <form @submit.prevent="submitClaimProject()" class="space-y-4">
         <div>
-          <label class="block text-xs text-slate-300 font-medium mb-1">Your Group</label>
-          <select x-model="claimForm.groupId" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white">
+          <label class="block text-xs text-slate-700 font-semibold mb-1">Your Group</label>
+          <select x-model="claimForm.groupId" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900">
             <option value="">-- Select Your Group --</option>
             <template x-for="g in groups.filter(x => !x.project_id)" :key="g.id">
               <option :value="g.id" x-text="g.group_name"></option>
@@ -438,10 +475,10 @@
           </select>
         </div>
         <div>
-          <label class="block text-xs text-slate-300 font-medium mb-1">4-Digit Group PIN</label>
-          <input type="password" inputmode="numeric" x-model="claimForm.pin" maxlength="4" pattern="\d{4}" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-mono text-white" />
+          <label class="block text-xs text-slate-700 font-semibold mb-1">4-Digit Group PIN</label>
+          <input type="password" inputmode="numeric" x-model="claimForm.pin" maxlength="4" pattern="\d{4}" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-mono text-slate-900" />
         </div>
-        <button type="submit" :disabled="loading" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-xl text-sm transition">
+        <button type="submit" :disabled="loading" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm shadow-sm transition">
           <span x-text="loading ? 'Locking...' : 'Lock In Project'"></span>
         </button>
       </form>
@@ -449,16 +486,16 @@
   </div>
 
   <!-- MODAL: Propose Custom Project -->
-  <div x-show="activeModal === 'proposeProject'" x-cloak class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
-    <div class="bg-slate-900 border border-slate-700 rounded-t-2xl sm:rounded-2xl max-w-md w-full p-5 sm:p-6">
+  <div x-show="activeModal === 'proposeProject'" x-cloak class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
+    <div class="bg-white border border-slate-200 rounded-t-2xl sm:rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl">
       <div class="flex justify-between items-center mb-3">
-        <h3 class="font-bold text-white text-base">Propose Custom CV Project</h3>
-        <button @click="activeModal = null" class="text-slate-400 hover:text-white p-1.5">✕</button>
+        <h3 class="font-bold text-slate-900 text-base">Propose Custom CV Project</h3>
+        <button @click="activeModal = null" class="text-slate-400 hover:text-slate-700 p-1.5 font-bold">✕</button>
       </div>
       <form @submit.prevent="submitProposeProject()" class="space-y-4">
         <div>
-          <label class="block text-xs text-slate-300 font-medium mb-1">Your Group</label>
-          <select x-model="proposalForm.groupId" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white">
+          <label class="block text-xs text-slate-700 font-semibold mb-1">Your Group</label>
+          <select x-model="proposalForm.groupId" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900">
             <option value="">-- Select Your Group --</option>
             <template x-for="g in groups.filter(x => !x.project_id)" :key="g.id">
               <option :value="g.id" x-text="g.group_name"></option>
@@ -466,18 +503,18 @@
           </select>
         </div>
         <div>
-          <label class="block text-xs text-slate-300 font-medium mb-1">4-Digit Group PIN</label>
-          <input type="password" inputmode="numeric" x-model="proposalForm.pin" maxlength="4" pattern="\d{4}" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-mono text-white" />
+          <label class="block text-xs text-slate-700 font-semibold mb-1">4-Digit Group PIN</label>
+          <input type="password" inputmode="numeric" x-model="proposalForm.pin" maxlength="4" pattern="\d{4}" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-mono text-slate-900" />
         </div>
         <div>
-          <label class="block text-xs text-slate-300 font-medium mb-1">Proposed Project Title *</label>
-          <input type="text" x-model="proposalForm.title" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white" />
+          <label class="block text-xs text-slate-700 font-semibold mb-1">Proposed Project Title *</label>
+          <input type="text" x-model="proposalForm.title" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900" />
         </div>
         <div>
-          <label class="block text-xs text-slate-300 font-medium mb-1">Beneficiary, Vision Scope & Controller Hardware *</label>
-          <textarea x-model="proposalForm.description" rows="3" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white"></textarea>
+          <label class="block text-xs text-slate-700 font-semibold mb-1">Beneficiary, Vision Scope & Controller Hardware *</label>
+          <textarea x-model="proposalForm.description" rows="3" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900"></textarea>
         </div>
-        <button type="submit" :disabled="loading" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-semibold py-3 rounded-xl text-sm transition">
+        <button type="submit" :disabled="loading" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-sm shadow-sm transition">
           Submit for Approval
         </button>
       </form>
@@ -485,46 +522,46 @@
   </div>
 
   <!-- MODAL: Admin Panel -->
-  <div x-show="activeModal === 'admin'" x-cloak class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
-    <div class="bg-slate-900 border border-slate-700 rounded-t-2xl sm:rounded-2xl max-w-xl w-full p-5 sm:p-6 max-h-[90vh] overflow-y-auto space-y-6">
+  <div x-show="activeModal === 'admin'" x-cloak class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
+    <div class="bg-white border border-slate-200 rounded-t-2xl sm:rounded-2xl max-w-xl w-full p-5 sm:p-6 max-h-[90vh] overflow-y-auto space-y-6 shadow-2xl">
       <div class="flex justify-between items-center">
-        <h3 class="font-bold text-white text-base">Admin Control Console</h3>
-        <button @click="activeModal = null" class="text-slate-400 hover:text-white p-1.5">✕</button>
+        <h3 class="font-bold text-slate-900 text-base">Admin Control Console</h3>
+        <button @click="activeModal = null" class="text-slate-400 hover:text-slate-700 p-1.5 font-bold">✕</button>
       </div>
 
       <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-end">
         <div class="flex-1">
-          <label class="block text-xs text-slate-300 font-medium mb-1">Admin Passphrase</label>
-          <input type="password" x-model="adminPass" placeholder="Enter your secret admin passphrase" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white" />
+          <label class="block text-xs text-slate-700 font-semibold mb-1">Admin Passphrase</label>
+          <input type="password" x-model="adminPass" placeholder="Enter your secret admin passphrase" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900" />
         </div>
-        <button type="button" @click="exportCSV()" class="bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shrink-0 transition">
+        <button type="button" @click="exportCSV()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl shrink-0 transition">
           ↓ Export Official CSV
         </button>
       </div>
 
       <!-- Add Official Project -->
-      <form @submit.prevent="submitAdminAddProject()" class="space-y-3 border-t border-slate-800 pt-4">
-        <h4 class="text-sm font-semibold text-emerald-400">Add Official Project Topic</h4>
-        <input type="text" x-model="adminNewProj.title" required placeholder="e.g., #31 Custom Project Title [Intermediate]" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white" />
-        <textarea x-model="adminNewProj.description" rows="2" placeholder="Beneficiary: ... Scope: ... Controller & Test: ..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white"></textarea>
-        <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition">Publish Project</button>
+      <form @submit.prevent="submitAdminAddProject()" class="space-y-3 border-t border-slate-200 pt-4">
+        <h4 class="text-sm font-bold text-emerald-700">Add Official Project Topic</h4>
+        <input type="text" x-model="adminNewProj.title" required placeholder="e.g., #31 Custom Project Title [Intermediate]" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900" />
+        <textarea x-model="adminNewProj.description" rows="2" placeholder="Beneficiary: ... Scope: ... Controller & Test: ..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900"></textarea>
+        <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition">Publish Project</button>
       </form>
 
       <!-- Pending Student Proposals -->
-      <div class="border-t border-slate-800 pt-4 space-y-3">
-        <h4 class="text-sm font-semibold text-amber-400">Pending Student Proposals</h4>
+      <div class="border-t border-slate-200 pt-4 space-y-3">
+        <h4 class="text-sm font-bold text-amber-700">Pending Student Proposals</h4>
         <template x-for="prop in projects.filter(p => p.status === 'pending_approval')" :key="prop.id">
-          <div class="bg-slate-950 border border-slate-800 p-3.5 rounded-xl space-y-2">
-            <div class="text-xs text-cyan-400 font-medium" x-text="`Proposed by: ${getGroupNameById(prop.proposed_by_group_id)}`"></div>
-            <div class="font-semibold text-sm text-white" x-text="prop.title"></div>
-            <p class="text-xs text-slate-400" x-text="prop.description"></p>
+          <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xl space-y-2">
+            <div class="text-xs text-indigo-600 font-bold" x-text="`Proposed by: ${getGroupNameById(prop.proposed_by_group_id)}`"></div>
+            <div class="font-bold text-sm text-slate-900" x-text="prop.title"></div>
+            <p class="text-xs text-slate-600" x-text="prop.description"></p>
             <div class="flex gap-2 pt-1">
-              <button @click="reviewProposal(prop.id, true)" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg">Approve & Assign</button>
-              <button @click="reviewProposal(prop.id, false)" class="bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg">Reject</button>
+              <button @click="reviewProposal(prop.id, true)" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg">Approve & Assign</button>
+              <button @click="reviewProposal(prop.id, false)" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg">Reject</button>
             </div>
           </div>
         </template>
-        <p x-show="projects.filter(p => p.status === 'pending_approval').length === 0" class="text-xs text-slate-500">No pending proposals.</p>
+        <p x-show="projects.filter(p => p.status === 'pending_approval').length === 0" class="text-xs text-slate-400">No pending proposals.</p>
       </div>
     </div>
   </div>
@@ -539,6 +576,8 @@
         groups: [],
         members: [],
         memberGroupMap: {},
+        activeTab: 'projects',
+        expandedCards: {},
         projectFilter: 'all',
         tierFilter: 'all',
         projectSearch: '',
@@ -581,6 +620,10 @@
             this.members = mRes.data;
             this.memberGroupMap = Object.fromEntries(mRes.data.map(m => [m.index_number, m.group_id]));
           }
+        },
+
+        toggleCard(id) {
+          this.expandedCards[id] = !this.expandedCards[id];
         },
 
         parseProject(proj) {
@@ -714,6 +757,7 @@
           if (error) return this.notify(error.message, 'error');
           this.newGroup = { name: '', pin: '', indices: ['', '', '', '', ''], projectId: '' };
           this.activeModal = null;
+          this.activeTab = 'groups';
           this.notify('Group formed and locked into the registry.');
           await this.fetchAll();
         },
@@ -729,6 +773,7 @@
           if (error) return this.notify(error.message, 'error');
           this.joinForm = { groupId: '', pin: '', indexNumber: '' };
           this.activeModal = null;
+          this.activeTab = 'groups';
           this.notify('Successfully joined group.');
           await this.fetchAll();
         },
